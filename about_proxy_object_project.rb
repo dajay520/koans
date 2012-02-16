@@ -12,13 +12,32 @@ require File.expand_path(File.dirname(__FILE__) + '/edgecase')
 # missing handler and any other supporting methods.  The specification
 # of the Proxy class is given in the AboutProxyObjectProject koan.
 
-class Proxy
+class Proxy 
   def initialize(target_object)
     @object = target_object
+    @countMap = Hash.new{|hash,key| hash[key]=0}
+    @methodList = Array.new
     # ADD MORE CODE HERE
   end
 
   # WRITE CODE HERE
+  def method_missing(method_name, *args, &block)
+    @countMap[method_name] =@countMap[method_name]+1
+    @methodList << method_name 
+    @object.send(method_name,*args)
+  end
+  
+  def called?(method_name)
+    @countMap[method_name]>0
+  end
+  
+  def number_of_times_called(method_name)
+    @countMap[method_name]
+  end
+  
+  def messages
+    @methodList 
+  end
 end
 
 # The proxy object should pass the following Koan:
@@ -113,6 +132,7 @@ class Television
   def on?
     @power == :on
   end
+
 end
 
 # Tests for the Television class.  All of theses tests should pass.
